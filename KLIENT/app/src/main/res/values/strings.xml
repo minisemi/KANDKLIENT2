@@ -1,0 +1,23 @@
+<resources>
+    <string name="app_name">Räddningstjänsten</string>
+
+    <string name="title_activity_nfcauthorization">NFC</string>
+
+    <string name="title_activity_video_communication">VIDEO CHAT</string>
+
+    <string name="title_activity_maps">MAP</string>
+
+    <string name="title_activity_activity_server">SERVER STUFF</string>
+
+    <string name="access_text">ACCESS</string>
+
+    <string name="title_activity_password">PASSWORD</string>
+
+    <string name="title_activity_info_window">LARMA</string>
+
+    <string name="title_activity_main_menu">MAIN MENU</string>
+    <string name="title_activity_contact_list">ContactList</string>
+    <string name="title_activity_contact">Contact List</string>
+    <string name="title_activity_file_transfer">fileTransfer</string>
+
+</resources>

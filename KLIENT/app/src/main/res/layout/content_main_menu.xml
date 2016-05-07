@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    //Good shit brah
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="30sp"
+        android:layout_marginTop="50dp"
+        android:id="@+id/Hello..."
+        android:layout_gravity="center_horizontal" />
+
+    <Button
+        android:id="@+id/vidComButton"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="Video Communication"
+        android:layout_marginTop="50dp"
+        />
+
+    <Button
+        android:id="@+id/mapButton"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="Maps"
+        />
+
+    <Button
+        android:id="@+id/serverButton"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="Server"/>
+
+    <Button
+        android:id="@+id/contactButton"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="Contact List"/>
+
+    <Button
+        android:id="@+id/fileButton"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="File transfer"/>
+
+
+
+
+
+</LinearLayout>
