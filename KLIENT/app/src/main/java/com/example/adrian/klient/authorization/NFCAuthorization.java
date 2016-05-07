@@ -12,9 +12,7 @@ import android.widget.Toast;
 
 import com.example.adrian.klient.R;
 import com.example.adrian.klient.ServerConnection.Connection;
-import com.example.adrian.klient.ServerConnection.NFCRequest;
 import com.example.adrian.klient.ServerConnection.Request;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
@@ -49,6 +47,11 @@ public class NFCAuthorization extends AppCompatActivity {
         if(authenticated){
             Toast.makeText(this, "AUTHENTICATED", Toast.LENGTH_SHORT).show();
             Intent passwordIntent = new Intent(this, PasswordActivity.class);
+            //Add the NFCid to the shared preferences
+            preferences = getSharedPreferences(PREFS,MODE_PRIVATE);
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.putInt("NFC_ID", authenticationCode);
+            editor.apply();
             startActivity(passwordIntent);
 
         } else {
@@ -70,7 +73,7 @@ public class NFCAuthorization extends AppCompatActivity {
         for (int i = 0; i < tagId.length; i++) {
             authenticationCode += Integer.toHexString(tagId[i] & 0xFF);
         }
-//        System.out.println("AUTH:" + authenticationCode.hashCode());
+        System.out.println("AUTH:" + authenticationCode.hashCode());
         return authenticationCode.hashCode();
     }
 
@@ -92,8 +95,8 @@ public class NFCAuthorization extends AppCompatActivity {
     public void getIDList(int authCode) {
         //TODO: Get the list from the database via the server.
 
-        Request getID = new NFCRequest(this,"get",String.valueOf(authCode));
-        System.out.println("MESSAGE "+getID.message);
+//        Request getID = new NFCRequest(this,"get",String.valueOf(authCode));
+        Request getID = new Request(this,"get_nfc",String.valueOf(authCode)).NFCRequest();
         connection = new Connection(getID,this);
         Thread t = new Thread(connection);
         t.start();
@@ -106,32 +109,13 @@ public class NFCAuthorization extends AppCompatActivity {
             jsonString = connection.getJson();
         } while(jsonString == null);
 
-        System.out.println("JSON STRING FROM SERVER> " + jsonString);
-
         //Fetch the id's
         try {
             JsonParser parser = new JsonParser();
-            JsonObject fromServer = (JsonObject)parser.parse(jsonString);
-            JsonArray data = fromServer.getAsJsonArray("data");
-            for (Object o : data) {
-                JsonObject jo = (JsonObject) o;
-                boolean access = jo.get("access").getAsBoolean();
+            JsonObject data = (JsonObject)parser.parse(jsonString);
+                boolean access = data.get("access").getAsBoolean();
                 if(access){
                     authenticated = true;
-                    String name = jo.get("name").getAsString();
-                    int id = jo.get("nfcid").getAsInt();
-
-                    // Get shared resourse and set the user's id
-                    preferences = getSharedPreferences(PREFS,MODE_PRIVATE);
-                    SharedPreferences.Editor editor = preferences.edit();
-                    editor.putString("USER_NAME",name);
-                    editor.putInt("USER_ID",id);
-                    editor.apply();
-                    //
-                    Toast.makeText(NFCAuthorization.this,"access: " + authenticated + "\nName: " + name + "\nNFC ID: " + id,Toast.LENGTH_LONG).show();
-                    System.out.println("access: " + authenticated + "\nName: " + name + "\nNFC_ID: " + id);
-                    //
-                }
             }
         } catch (JsonSyntaxException syntax){
             System.out.println("Wrong syntax on server message");

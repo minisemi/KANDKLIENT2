@@ -10,7 +10,6 @@ import android.widget.ListView;
 
 import com.example.adrian.klient.R;
 import com.example.adrian.klient.ServerConnection.Connection;
-import com.example.adrian.klient.ServerConnection.ContactRequest;
 import com.example.adrian.klient.ServerConnection.Request;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -23,11 +22,14 @@ public class ContactList extends AppCompatActivity {
     ArrayAdapter<String> adapter;
     Connection connection;
     private ArrayList contactList;
+    String result;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contact_list);
+
+        result = getIntent().getExtras().getString("DATA");
 
         ListView listView = (ListView)findViewById(R.id.contactList);
         // Arraylist to store the contacts
@@ -58,7 +60,8 @@ public class ContactList extends AppCompatActivity {
     }
 
     public void getContacts (){
-        Request getContacts = new ContactRequest(this,"get");
+//        Request getContacts = new ContactRequest(this,"get");
+/*        Request getContacts = new Request(this,"get").contactRequest();
         connection = new Connection(getContacts,this);
         Thread t = new Thread(connection);
         t.start();
@@ -69,11 +72,11 @@ public class ContactList extends AppCompatActivity {
             jsonString = connection.getJson();
         } while(jsonString == null);
         System.out.println("jsonString: " + jsonString);
-
+*/
         contactList = new ArrayList<>();
-        //Parser to parse through all contacts
+        //Get permission level
         JsonParser parser = new JsonParser();
-        JsonObject object = (JsonObject)parser.parse(jsonString);
+        JsonObject object = (JsonObject) parser.parse(result);
         int permission = object.get("permission").getAsInt();
         JsonArray data = (JsonArray) object.get("data");
 
@@ -107,9 +110,9 @@ public class ContactList extends AppCompatActivity {
                     contact.setAddress(address);
                     title = o.get("title").getAsString();
                     contact.setWorkTitle(title);
-                    ssn = o.get("pnr").getAsString();
+                    ssn = o.get("ssn").getAsString();
                     contact.setSSN(ssn);
-                    salary = o.get("pay").getAsString();
+                    salary = o.get("salary").getAsString();
                     contact.setSalary(salary);
                     break;
                 default:

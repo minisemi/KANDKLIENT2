@@ -9,8 +9,11 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.example.adrian.klient.QoSManager.QoSManager;
 import com.example.adrian.klient.ServerConnection.ServerActivity;
+import com.example.adrian.klient.VidCom.AppRtcGo;
 import com.example.adrian.klient.contactList.ContactList;
+import com.example.adrian.klient.contactList.ContactListAsyncTask;
 import com.example.adrian.klient.maps.MapsActivity;
 import com.example.adrian.klient.video.VideoCommunication;
 
@@ -19,11 +22,13 @@ import com.example.adrian.klient.video.VideoCommunication;
  */
 public class MainMenuActivity extends Activity implements View.OnClickListener{
 
+    Context context;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_menu);
-
+        context = this;
 
         SharedPreferences userInfo = getSharedPreferences("USER_INFO", Context.MODE_PRIVATE);
         String name = userInfo.getString("USER_NAME", "Anon");
@@ -33,20 +38,22 @@ public class MainMenuActivity extends Activity implements View.OnClickListener{
         Button mapButton = (Button) findViewById(R.id.mapButton);
         Button serverButton = (Button) findViewById(R.id.serverButton);
         Button contactButton = (Button) findViewById(R.id.contactButton);
-//        Button fileButton = (Button) findViewById(R.id.fileButton);
+        Button appRtcBut = (Button) findViewById(R.id.appRtcBut);
+        final Button getLevelsButton = (Button) findViewById(R.id.getLevelsButton);
 
         hello.setText("Hello, " + name);
         vidComButton.setOnClickListener(this);
         mapButton.setOnClickListener(this);
         serverButton.setOnClickListener(this);
         contactButton.setOnClickListener(this);
-//        fileButton.setOnClickListener(this);
-
-        serverButton.setOnClickListener(new View.OnClickListener() {
-            @Override
+        appRtcBut.setOnClickListener(this);
+        getLevelsButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                Intent intent = new Intent(MainMenuActivity.this, ServerActivity.class);
-                startActivity(intent);
+                QoSManager qOSM = new QoSManager(context);
+                int bL = qOSM.getBatteryLevel();
+                int nL = qOSM.getConnectivityLevel();
+
+                getLevelsButton.setText("bL: " + bL + "\n" + "nL: " + nL);
             }
         });
     }
@@ -55,6 +62,11 @@ public class MainMenuActivity extends Activity implements View.OnClickListener{
     public void onClick(View v) {
         Intent intent;
         switch(v.getId()) {
+            case R.id.appRtcBut:
+                intent = new Intent(this, AppRtcGo.class);
+                startActivity(intent);
+                break;
+
             case R.id.vidComButton:
                 intent = new Intent(this, VideoCommunication.class);
                 startActivity(intent);
@@ -72,13 +84,9 @@ public class MainMenuActivity extends Activity implements View.OnClickListener{
 
             case R.id.contactButton:
                 intent = new Intent(this, ContactList.class);
-                startActivity(intent);
+                new ContactListAsyncTask(this, intent).execute();
+                //startActivity(intent);
                 break;
-
-//            case R.id.fileButton:
-//                intent = new Intent(this, fileTransfer.class);
-//                startActivity(intent);
-//                break;
 
             default:
                 break;

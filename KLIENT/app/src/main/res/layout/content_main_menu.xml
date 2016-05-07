@@ -3,9 +3,7 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    //Good shit brah
-
-    <TextView
+     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="30sp"
@@ -35,7 +33,7 @@
         android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:text="Server"/>
+        android:text="SSL-Test"/>
 
     <Button
         android:id="@+id/contactButton"
@@ -45,11 +43,18 @@
         android:text="Contact List"/>
 
     <Button
-        android:id="@+id/fileButton"
+        android:id="@+id/appRtcBut"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:text="File transfer"/>
+        android:text="AppRtc"/>
+
+    <Button
+        android:id="@+id/getLevelsButton"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="Levels"/>
 
 
 

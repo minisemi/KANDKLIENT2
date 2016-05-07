@@ -15,10 +15,6 @@ class Sender extends Thread
         mOut = aOut;
     }
 
-    /**
-     * Until interrupted reads messages from the standard input (keyboard)
-     * and sends them to the chat server through the socket.
-     */
     public void run()
     {
         try {

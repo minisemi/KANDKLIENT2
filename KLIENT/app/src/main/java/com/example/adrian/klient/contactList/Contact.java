@@ -1,6 +1,13 @@
 package com.example.adrian.klient.contactList;
 
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -10,12 +17,17 @@ import android.widget.TextView;
 
 import com.example.adrian.klient.R;
 import com.example.adrian.klient.ServerConnection.Connection;
-import com.example.adrian.klient.ServerConnection.ContactRequest;
 import com.example.adrian.klient.ServerConnection.Request;
+import com.example.adrian.klient.VidCom.AppRtcGo;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 public class Contact extends AppCompatActivity {
     private String name, address, phoneNr, title, ssn, salary;
     private int permission;
+
+    String response;
+    ProgressDialog waiting;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,6 +39,7 @@ public class Contact extends AppCompatActivity {
         final Bundle extras = getIntent().getExtras();
         toolbar.setTitle(extras.getString("NAME"));
         setSupportActionBar(toolbar);
+        FloatingActionButton call_fab = (FloatingActionButton) findViewById(R.id.call_fab);
 
         TextView titleView, ssnView, salaryView, addressView;
         // Displayed for all permission levels
@@ -69,8 +82,8 @@ public class Contact extends AppCompatActivity {
                 delete.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Request deleteRequest = new ContactRequest(Contact.this,"delete",extras.getString("SSN"));
-                        Connection connection = new Connection(deleteRequest, Contact.this);
+                        Request deleteRequest = new Request(Contact.this,"delete",extras.getString("SSN")).contactRequest();
+                        Connection connection = new Connection(deleteRequest, Contact.this, handler);
                         Thread t = new Thread(connection);
                         t.start();
                     }
@@ -78,8 +91,57 @@ public class Contact extends AppCompatActivity {
                 break;
         }
 
+        call_fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                waiting = new ProgressDialog(Contact.this,ProgressDialog.STYLE_SPINNER);
+                waiting.setMessage("CALLING");
+                waiting.setCancelable(false);
+                waiting.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+                waiting.show();
+
+                Request callRequest = new Request(Contact.this,"call",extras.getString("PHONE_NR")).callRequest();
+                Connection connection = new Connection(callRequest, Contact.this, handler);
+                new Thread(connection).start();
+
+            }
+        });
 
     }
+    Handler handler = new Handler(Looper.getMainLooper()){
+        @Override
+        public void handleMessage(Message msg) {
+            Looper.prepare();
+            response = (String) msg.getData().get("json");
+            waiting.dismiss();
+            doSomething();
+        }
+    };
+
+    private void doSomething() {
+        JsonParser parser = new JsonParser();
+        JsonObject data = (JsonObject)parser.parse(response);
+        boolean callready = data.get("callready").getAsBoolean();
+        if(callready){
+            String videoID = data.get("videoid").getAsString();
+            startChatting(videoID);
+        } else {
+            System.out.println("ERROR LOL");
+        }
+    }
+
+    private void startChatting(String id){
+        System.out.println("Starting videoCall");
+        Intent intent = new Intent(Contact.this, AppRtcGo.class);
+        intent.putExtra("ROOM", id);
+        startActivity(intent);
+    }
+
     //Setters and getters
     public String get_name() {
         return this.name;
@@ -123,5 +185,6 @@ public class Contact extends AppCompatActivity {
     public void setPermission(int permission){
         this.permission = permission;
     }
+
 
 }

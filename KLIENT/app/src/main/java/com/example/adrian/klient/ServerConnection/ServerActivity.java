@@ -6,45 +6,63 @@ import android.view.View;
 import android.widget.Button;
 
 import com.example.adrian.klient.R;
+import com.google.gson.JsonObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ServerActivity extends AppCompatActivity {
 
-    Button btn, btn2;
+    Button ssl,wrongssl,nossl;
     OldConnection oldConn;
     Connection conn;
+    Connection2 conn2;
+    List addList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_activity_server);
+        addList = new ArrayList();
+        ssl = (Button) findViewById(R.id.sslbutt);
+        wrongssl = (Button) findViewById(R.id.wrongsslbutt);
+        nossl = (Button) findViewById(R.id.nosslbutt);
 
-        btn = (Button) findViewById(R.id.button);
-        btn2 = (Button) findViewById(R.id.button2);
+            JsonObject addReq = new JsonObject();
+            addReq.addProperty("lat", 58.8963790165493);
+            addReq.addProperty("lon", 15.460723824799063);
+            addReq.addProperty("event","Här brinner det!");
+            addList.add(addReq);
 
-        // Create and start Sender thread
 
-        btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-              //  String query = "SELECT * FROM Test";
-                Request oldRequest = new MapRequest(ServerActivity.this,"add","20","20","Katt i träd");
-                System.out.println("msg: " + oldRequest.message);
-                oldConn = new OldConnection(oldRequest,ServerActivity.this);
-                Thread t = new Thread(oldConn);
-                t.start();
-            }
-        });
-        btn2.setOnClickListener(new View.OnClickListener() {
+        ssl.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
-                Request request = new MapRequest(ServerActivity.this,"add","30","30","Katt i träd");
-                System.out.println("msg: " + request.message);
-                conn = new Connection(request,ServerActivity.this);
+                Request request = new Request(ServerActivity.this, "add", addList).mapRequest();
+                conn = new Connection(request, ServerActivity.this);
                 Thread t = new Thread(conn);
                 t.start();
             }
 
+        });
+        wrongssl.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Request request2 = new Request(ServerActivity.this,"add",addList).mapRequest();
+                conn2 = new Connection2(request2,ServerActivity.this);
+                Thread t = new Thread(conn2);
+                t.start();
+            }
+        });
+        nossl.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Request request = new Request(ServerActivity.this,"add",addList).mapRequest();
+                oldConn = new OldConnection(request,ServerActivity.this);
+                Thread t = new Thread(oldConn);
+                t.start();
+            }
         });
     }
 }

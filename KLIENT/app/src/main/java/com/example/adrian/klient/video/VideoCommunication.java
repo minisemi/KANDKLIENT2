@@ -67,9 +67,9 @@ public class VideoCommunication extends AppCompatActivity {
             batteryFlag = 2;
         } else if (batteryPercentage < 40 && batteryPercentage>= 25){
             batteryFlag = 1;
-        } else batteryFlag = 0;
+        } else
+            batteryFlag = 0;
 
         return batteryFlag;
     }
-
 }

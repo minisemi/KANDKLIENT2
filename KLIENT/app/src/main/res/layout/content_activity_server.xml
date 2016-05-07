@@ -13,19 +13,26 @@
     tools:showIn="@layout/activity_activity_server">
 
     <Button
-        android:layout_width="wrap_content"
+        android:layout_width="150dp"
         android:layout_height="wrap_content"
-        android:text="SSL"
-        android:id="@+id/button2"
+        android:text="Correct cert"
+        android:id="@+id/sslbutt"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true" />
 
     <Button
-        android:layout_width="wrap_content"
+        android:layout_width="150dp"
         android:layout_height="wrap_content"
-        android:text="Non-SSL"
-        android:id="@+id/button"
-        android:layout_below="@+id/button2"
+        android:text="Wrong cert"
+        android:id="@+id/wrongsslbutt"
+        android:layout_below="@+id/sslbutt"
         android:layout_centerHorizontal="true" />
 
+    <Button
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:text="No cert"
+        android:id="@+id/nosslbutt"
+        android:layout_below="@+id/wrongsslbutt"
+        android:layout_centerHorizontal="true" />
 </RelativeLayout>

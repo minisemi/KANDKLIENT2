@@ -29,27 +29,65 @@ public class Client {
     }
 
     protected Socket getConnection(String ip, int port) throws IOException{
+        String trustStorePass = "password";
+        String keyStorePass = "password";
+
         try{
+            //Setup keystore
+            KeyStore keyStore = KeyStore.getInstance("BKS");
+            InputStream keyStoreStream = context.getResources().openRawResource(R.raw.client);
+            keyStore.load(keyStoreStream, keyStorePass.toCharArray());
+
+            KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+            kmf.init(keyStore, keyStorePass.toCharArray());
 
             //Setup truststore
             KeyStore trustStore = KeyStore.getInstance("BKS");
-            TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-            InputStream trustStoreStream = context.getResources().openRawResource(R.raw.clienttruststore);
+            InputStream in = context.getResources().openRawResource(R.raw.clienttruststore);
             // kanske kan ha detta som PW?
-            trustStore.load(trustStoreStream, "hallonsorbet".toCharArray());
-            trustManagerFactory.init(trustStore);
+            trustStore.load(in, trustStorePass.toCharArray());
+            TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+            tmf.init(trustStore);
+
+            //Setup SSL context to use the truststore and keystore
+            SSLContext ctx = SSLContext.getInstance("TLS");
+            ctx.init(kmf.getKeyManagers(),tmf.getTrustManagers(),null);
+
+            SSLSocketFactory factory = ctx.getSocketFactory();
+            SSLSocket socket = (SSLSocket) factory.createSocket(ip,port);
+            socket.setEnabledCipherSuites(SSLUtils.getCipherSuitesWhiteList(socket.getEnabledCipherSuites()));
+            socket.startHandshake();
+            return socket;
+        } catch (GeneralSecurityException e) {
+            Log.e(this.getClass().toString(), "Exception while creating context: ", e);
+            throw new IOException("Could not connect to SSL Server", e);
+        }
+    }
+
+    protected Socket getConnection2(String ip, int port) throws IOException{
+        String trustStorePass = "password";
+        String keyStorePass = "password";
+        try{
+
+            //Setup truststore
+//            KeyStore trustStore = KeyStore.getInstance("BKS");
+//            TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+//            InputStream trustStoreStream = context.getResources().openRawResource(R.raw.client);
+//            // kanske kan ha detta som PW?
+//            trustStore.load(trustStoreStream, trustStorePass.toCharArray());
+//            trustManagerFactory.init(trustStore);
 
             //Setup keystore
-//            KeyStore keyStore = KeyStore.getInstance("BKS");
-//            KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-//            InputStream keyStoreStream = context.getResources().openRawResource(R.raw.client);
-//            keyStore.load(keyStoreStream,"hallonsorbet".toCharArray());
-//            keyManagerFactory.init(keyStore,"hallonsorbet".toCharArray());
+            KeyStore keyStore = KeyStore.getInstance("BKS");
+            KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+            InputStream keyStoreStream = context.getResources().openRawResource(R.raw.fakeclient);
+            keyStore.load(keyStoreStream,keyStorePass.toCharArray());
+            keyManagerFactory.init(keyStore, keyStorePass.toCharArray());
 
             //Setup SSL context to use the truststore and keystore
             SSLContext sslContext = SSLContext.getInstance("TLS");
 //            sslContext.init(keyManagerFactory.getKeyManagers(),trustManagerFactory.getTrustManagers(),null);
-            sslContext.init(null,trustManagerFactory.getTrustManagers(),null);
+            sslContext.init(keyManagerFactory.getKeyManagers(),null,null);
             SSLSocketFactory factory = sslContext.getSocketFactory();
             SSLSocket socket = (SSLSocket) factory.createSocket(ip,port);
             socket.setEnabledCipherSuites(SSLUtils.getCipherSuitesWhiteList(socket.getEnabledCipherSuites()));

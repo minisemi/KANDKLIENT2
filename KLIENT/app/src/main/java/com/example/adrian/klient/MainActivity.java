@@ -8,8 +8,6 @@ import android.view.View;
 import android.widget.Button;
 
 import com.example.adrian.klient.authorization.NFCAuthorization;
-import com.example.adrian.klient.maps.MapsActivity;
-import com.example.adrian.klient.video.VideoCommunication;
 
 public class MainActivity extends Activity implements View.OnClickListener {
 
@@ -19,10 +17,12 @@ public class MainActivity extends Activity implements View.OnClickListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //Clear User information
+        getSharedPreferences("USER_INFO",MODE_PRIVATE).edit().clear().apply();
+
         Button authorizationButton = (Button) findViewById(R.id.NFCButton);
         Button guestBtn = (Button) findViewById(R.id.guestButton);
 
-        guestBtn.setVisibility(View.VISIBLE);
         guestBtn.setBackgroundColor(Color.TRANSPARENT);
 
         authorizationButton.setOnClickListener(this);

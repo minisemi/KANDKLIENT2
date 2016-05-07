@@ -13,10 +13,13 @@ import android.widget.Toast;
 
 import com.example.adrian.klient.R;
 import com.example.adrian.klient.internetcontrol.InternetController;
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -34,6 +37,8 @@ import java.util.Iterator;
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     public GoogleMap mMap;
+    public LatLngBounds.Builder builder;
+    public LatLngBounds bounds;
     private Context context = this;
     private File markersFile = null;
     public ArrayList markerList;
@@ -58,6 +63,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        builder = new LatLngBounds.Builder();
+        LatLng startCoords = new LatLng(58.416168568835985,15.62009397894144);
+        builder.include(startCoords);
+        LatLngBounds bounds = builder.build();
+
+        int padding = 0;
+        //Sets the zoom on Östergötland
+        CameraUpdate cu = CameraUpdateFactory.newLatLngZoom(startCoords,8f);
+        mMap.animateCamera(cu);
+
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
 
                                        @Override
@@ -115,6 +130,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         // Loads the clients locally saved markers
         loadMarkers();
+        // Uncomment these if you need to clear the local marker list
 //        markerList.clear();
 //        mMap.clear();
 //        saveMarkers();
