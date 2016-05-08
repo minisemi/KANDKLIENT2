@@ -56,6 +56,20 @@
         android:layout_gravity="center_horizontal"
         android:text="Levels"/>
 
+    <Button
+        android:id="@+id/voteButton"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="Vote"/>
+
+    <Button
+        android:id="@+id/receiveVoteButton"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="Receive Vote"/>
+
 
 
 

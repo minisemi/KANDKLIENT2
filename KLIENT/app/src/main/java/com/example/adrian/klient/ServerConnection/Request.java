@@ -81,6 +81,28 @@ public class Request {
         return this;
     }
 
+    public Request voteRequest (){
+        request.addProperty("activity", "vote");
+        request.addProperty("action", "vote");
+        request.addProperty("sessionid", id);
+        data.addProperty("message", args[0]);
+        dataArray.add(data);
+        request.add("data", dataArray);
+        message = request.toString();
+        return this;
+
+    }
+
+    public Request receiveRequest (){
+        request.addProperty("activity", "receive");
+        request.addProperty("action", "receive");
+        request.addProperty("sessionid", id);
+        request.addProperty("data","");
+        message = request.toString();
+        return this;
+
+    }
+
     public Request mapRequest() {
 
         request.addProperty("activity","map");
