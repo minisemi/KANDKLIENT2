@@ -58,8 +58,14 @@ public class VoteActivity extends AppCompatActivity {
     VoteAsyncTask voteAsyncTask2;
     int limit = 1;
     EditText voteLimit;
-    encryptThread eT;
     FileUtils fileUtils1;
+    String encryptedText;
+    FileEncryption encryption;
+    FileUtils fileUtils;
+    Boolean done = false;
+    String startTime;
+    String count;
+    VoteAsyncTask voteAsyncTask;
 
 
     @Override
@@ -70,10 +76,12 @@ public class VoteActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         try {
+            encryption = new FileEncryption();
+            fileUtils = new FileUtils();
 
             // ALLA FILER SKRIVS I UTF-8. SERVERN LÄSER IN I ANSI, DÄRFÖR DET BLIR STRUL.
-            InputStream inputStream = this.getAssets().open("TEST.txt");
-            in1 = stream2file(inputStream, "TEST", ".txt");
+            InputStream inputStream = this.getAssets().open("In1.txt");
+            in1 = stream2file(inputStream, "In1", ".txt");
             inputStream = this.getAssets().open("In2.txt");
             in2 = stream2file(inputStream, "In2", ".txt");
             inputStream = this.getAssets().open("encrypted1.txt");
@@ -114,6 +122,8 @@ public class VoteActivity extends AppCompatActivity {
 
         }catch (IOException i){
             i.printStackTrace();
+        } catch (GeneralSecurityException g){
+            g.printStackTrace();
         }
 
         voteLimit = (EditText) findViewById(R.id.votelimit);
@@ -128,16 +138,26 @@ public class VoteActivity extends AppCompatActivity {
                     for (int i = 1; i <= limit; i++) {
                         long time = System.currentTimeMillis();
                         String startTime = Long.toString(time);
-
-                        /*
-                        voteAsyncTask = new VoteAsyncTask(context, encryptMix(encrypted1, encrypted1_1, encryptClient(in1, encrypted1)), "true", startTime, Integer.toString(limit));
+                        try {
+                            encryption.makeKey();
+                            encryption.saveKey(encryptedAesKeyReceiver, rsaPublicKeyReceiver);
+                            encryption.encrypt(in1, encrypted1);
+                            encryption.saveKey(encryptedAesKeyMix, rsaPublicKeyMix);
+                            encryption.encrypt(encrypted1, encrypted1_1);
+                            String encrypted = fileUtils.readFileToString(encrypted1_1);
+                        voteAsyncTask = new VoteAsyncTask(context, encrypted, "true", startTime, Integer.toString(limit), Integer.toString(i));
                             voteAsyncTask.execute();
-                        encryptMix(encrypted1, encrypted1_1, encryptClient(in1, encrypted1));
-                        decryptMix(encrypted1_1, decrypted1_1);
-                        decryptReceiver(decrypted1_1, decrypted1);*/
-                        eT = new encryptThread(startTime, i);
-                        eT.start();
+                        }catch (GeneralSecurityException k){
+                            k.printStackTrace();
+                        }catch (IOException j){
+                            j.printStackTrace();
+                        }
+
+
+                        //eT = new encryptThread(startTime, i);
+                       // eT.start();
                     }
+
 
 
                     /*try {
@@ -163,7 +183,7 @@ public class VoteActivity extends AppCompatActivity {
                     //String string = encryptMix(encrypted1, encrypted1_1, encryptClient(in1, encrypted1));
                     //JsonObject j = encryptClient(in1, encrypted1);
 
-                    Snackbar.make(v, "Update successful!", Snackbar.LENGTH_LONG)
+                    Snackbar.make(v, "Voting successful!", Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
                 } else {
                     Snackbar.make(v, "No connection available. Update not successful!", Snackbar.LENGTH_LONG)
@@ -181,13 +201,9 @@ public class VoteActivity extends AppCompatActivity {
                     for (int i = 1; i <= limit; i++){
                         long time = System.currentTimeMillis();
                         String startTime = Long.toString(time);
-                        try {
-                            String vote = fileUtils1.readFileToString(in1);
-                        voteAsyncTask2 = new VoteAsyncTask(context, vote, "false", startTime, Integer.toString(limit), Integer.toString(i));
+
+                        voteAsyncTask2 = new VoteAsyncTask(context, "Alexander rostar pa 2", "false", startTime, Integer.toString(limit), Integer.toString(i));
                         voteAsyncTask2.execute();
-                        }catch (IOException j){
-                            j.printStackTrace();
-                        }
                     }
 
                     //SKICKA OKRYPTERAT HÄR FÖR ATT JÄMFÖRA
@@ -208,57 +224,6 @@ public class VoteActivity extends AppCompatActivity {
 
     }
 
-    public class encryptThread extends Thread {
-        String encryptedText;
-        FileEncryption encryption;
-        FileUtils fileUtils;
-        Boolean done = false;
-        String startTime;
-        String count;
-
-        public encryptThread (String startTime, int i){
-            this.startTime = startTime;
-            this.count = Integer.toString(i);
-
-        }
-
-        @Override
-        public void run() {
-            super.run();
-
-            try {
-                encryption = new FileEncryption();
-                fileUtils = new FileUtils();
-                encryption.makeKey();
-                encryption.saveKey(encryptedAesKeyReceiver, rsaPublicKeyReceiver);
-                encryption.encrypt(in1, encrypted1);
-                encryption.saveKey(encryptedAesKeyMix, rsaPublicKeyMix);
-                encryption.encrypt(encrypted1, encrypted1_1);
-                Log.d("THREAD: ", "DONE");
-                encryptedText = fileUtils.readFileToString(encrypted1_1);
-                //done = true;
-
-                VoteAsyncTask voteAsyncTask = new VoteAsyncTask(context, encryptedText, "true", startTime, Integer.toString(limit), count);
-                voteAsyncTask.execute();
-               /* encryption.loadKey(encryptedAesKeyMix, rsaPrivateKeyMix);
-                encryption.decrypt(encrypted1_1, decrypted1_1);
-                encryption.loadKey(encryptedAesKeyReceiver, rsaPrivateKeyReceiver);
-                encryption.decrypt(decrypted1_1, decrypted1);
-                String l = fileUtils.readFileToString(decrypted1);
-                Log.d("DECrypted TeXT", l);*/
-            } catch (GeneralSecurityException g){
-                g.printStackTrace();
-            } catch (IOException k){
-                k.printStackTrace();
-            }
-        }
-
-
-
-        public String getEncryptedText () {return encryptedText;}
-
-        public Boolean getDone () {return done;}
-    }
 
     public File stream2file (InputStream in, String prefix, String suffix) throws IOException {
        //File tempFile = File.createTempFile(prefix, suffix);

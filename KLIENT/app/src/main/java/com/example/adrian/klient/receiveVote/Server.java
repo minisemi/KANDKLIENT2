@@ -36,6 +36,27 @@ public class Server {
     ServerSocket serverSocket;
     String message = "";
     static final int socketServerPORT = 8080;
+    FileEncryption decryptReceiver;
+    File in1;
+    File in2;
+    public File encrypted1;
+    File encrypted1_1;
+    File encrypted2;
+    File encrypted2_1;
+    public File decrypted1;
+    File decrypted1_1;
+    File rsaPublicKeyReceiver;
+    File rsaPublicKeyMix;
+    public File encryptedAesKeyReceiver;
+    File rsaPrivateKeyMix;
+    File encryptedAesKeyMix;
+    public File rsaPrivateKeyReceiver;
+    FileUtils fileUtils;
+
+    private Socket socket;
+
+    int order1=0, order2=0, limit1, limit2;
+    String votes1, votes2;
 
     JsonObject receivedObject;
     BufferedReader in;
@@ -91,11 +112,11 @@ public class Server {
                 while (true) {
                     // block the call until connection is created and return
                     // Socket object
-                    new ConnectionListener(serverSocket.accept()).start();
-                }
 
 
-                    /*Socket socket = serverSocket.accept();
+
+
+                    Socket socket = serverSocket.accept();
 
                     in = new BufferedReader(new InputStreamReader(
                             socket.getInputStream()));
@@ -104,7 +125,7 @@ public class Server {
                     while (!clientMessage.isEmpty()) {
                         //System.out.println("RECEIVED MESSAGE: " + clientMessage);
 
-                        receivedVote = processMessage(clientMessage);
+                        processMessage(clientMessage);
                         clientMessage ="";
                     }
 
@@ -114,102 +135,14 @@ public class Server {
 
 
                     //OM SLUTAR FUNKA KÖR WEAKREFERENCE (KOLLA RECEIVEASYNCTASK)
-                    activity.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            //activity.msg.setText(message);
-                            if (receivedVote.equalsIgnoreCase("1")){
-                            activity.votes1.setText(votes1);
-                            } else {
-                                activity.votes2.setText(votes2);
-                            }
-                            if (count1 == limit){
-                                String elapsed1 = Long.toString(timeElapsed1);
-                                message += count1 + " encrypted votes took: " + elapsed1 + " milliseconds" + "\n";
-                                count1 = 0;
-                                activity.msg.setText(message);
 
-                            }
-
-                            if (count2 == limit){
-                                String elapsed2 = Long.toString(timeElapsed2);
-                                message += count2 + " non-encrypted votes took: " + elapsed2 + " milliseconds" + "\n";
-                                count2 = 0;
-                                activity.msg.setText(message);
-
-                            }
-                        }
-                    });
-
-                    /*SocketServerReplyThread socketServerReplyThread =
-                            new SocketServerReplyThread(socket, count);
-                    socketServerReplyThread.run();
                     socket.close();
 
-                }*/
+                }
             } catch (IOException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
-        }
-
-
-    }
-
-    class ConnectionListener extends Thread {
-        FileEncryption decryptReceiver;
-        File in1;
-        File in2;
-        public File encrypted1;
-        File encrypted1_1;
-        File encrypted2;
-        File encrypted2_1;
-        public File decrypted1;
-        File decrypted1_1;
-        File rsaPublicKeyReceiver;
-        File rsaPublicKeyMix;
-        public File encryptedAesKeyReceiver;
-        File rsaPrivateKeyMix;
-        File encryptedAesKeyMix;
-        public File rsaPrivateKeyReceiver;
-        FileUtils fileUtils;
-
-        private Socket socket;
-
-        int order1=0, order2=0, limit1, limit2;
-        String votes1, votes2;
-
-
-        public ConnectionListener(Socket socketValue) {
-            socket = socketValue;
-            fileUtils = new FileUtils();
-        }
-
-        public void run() {
-            try {
-                in = new BufferedReader(new InputStreamReader(
-                        socket.getInputStream()));
-                String clientMessage = in.readLine();
-
-                while (!clientMessage.isEmpty()) {
-                    //System.out.println("RECEIVED MESSAGE: " + clientMessage);
-
-                    processMessage(clientMessage);
-                    clientMessage = "";
-                }
-                socket.close();
-
-                //count++;
-
-                //message += "#" + count + " from " + socket.getInetAddress() + ":" + socket.getPort() + ": " + elapsed + "\n";
-
-
-                //OM SLUTAR FUNKA KÖR WEAKREFERENCE (KOLLA RECEIVEASYNCTASK)
-
-            } catch (IOException i){
-                i.printStackTrace();
-
-                }
         }
 
         public void processMessage (String jsonString){
@@ -231,8 +164,8 @@ public class Server {
                     rsaPrivateKeyReceiver = stream2file(inputStream, "privateReceiver", ".der");
                     inputStream = activity.getAssets().open("decrypted1.txt");
                     decrypted1 = stream2file(inputStream, "decrypted1", ".txt");
-                    inputStream = activity.getAssets().open("TEST.txt");
-                    in1 = stream2file(inputStream, "TEST", ".txt");
+                    inputStream = activity.getAssets().open("In1.txt");
+                    in1 = stream2file(inputStream, "In1", ".txt");
                     inputStream = activity.getAssets().open("publicReceiver.der");
                     rsaPublicKeyReceiver = stream2file(inputStream, "publicReceiver", ".der");
                     inputStream.close();
@@ -249,27 +182,29 @@ public class Server {
                     decryptReceiver.decrypt(encrypted1, decrypted1);
                     //String decryptedText = fileUtils.readFileToString(decrypted1);
                     //Log.d("RECEIVEASYNCTASK: ","DECRYPTED TEXT: "+decryptedText);
-                   // count1++;
-                        limit1 = Integer.parseInt(receivedObject.get("limit").getAsString().toLowerCase());
-                    votes1 = Integer.toString(limit1);
+                     count1++;
+
+                    limit1 = Integer.parseInt(receivedObject.get("limit").getAsString().toLowerCase());
+                    votes1 = Integer.toString(count1);
                     if (order1 == 1){
                         startTime1 = receivedObject.get("starttime").getAsString().toLowerCase();
                     }
 
+                    if (count1 == limit1) {
                         timeElapsed1 = System.currentTimeMillis() - 1430 - Long.parseLong(startTime1);
+                    }
 
                     activity.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-
                             activity.votes1.setText(votes1);
-
+                            if (count1 == limit1){
                                 String elapsed1 = Long.toString(timeElapsed1);
                                 message += count1 + " encrypted votes took: " + elapsed1 + " milliseconds" + "\n";
-                                limit1 = 0;
+                                count1 = 0;
                                 activity.msg.setText(message);
 
-
+                            }
                         }
                     });
 
@@ -280,33 +215,30 @@ public class Server {
                 }
 
             } else {
-                try {
-                    InputStream inputStream = activity.getAssets().open("TEST.txt");
-                    in1 = stream2file(inputStream, "TEST", ".txt");
-                    String l = fileUtils.readFileToString(in1);
-                }catch (IOException k){
-                    k.printStackTrace();
-                }
 
                 order2 = Integer.parseInt(receivedObject.get("count").getAsString().toLowerCase());
-               // count2++;
+                count2++;
                 limit2 = Integer.parseInt(receivedObject.get("limit").getAsString().toLowerCase());
-                votes2 = Integer.toString(limit2);
+                votes2 = Integer.toString(count2);
                 if (order2 == 1) {
                     startTime2 = receivedObject.get("starttime").getAsString().toLowerCase();
                 }
 
+                if (count2 == limit2) {
                     timeElapsed2 = System.currentTimeMillis() - 1430 - Long.parseLong(startTime2);
+                }
 
                 activity.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         activity.votes2.setText(votes2);
 
+                        if (count2 == limit2) {
                             String elapsed2 = Long.toString(timeElapsed2);
-                            message += limit2 + " non-encrypted votes took: " + elapsed2 + " milliseconds" + "\n";
+                            message += count2 + " non-encrypted votes took: " + elapsed2 + " milliseconds" + "\n";
                             count2 = 0;
                             activity.msg.setText(message);
+                        }
 
 
                     }
@@ -325,7 +257,10 @@ public class Server {
             // return tempFile;
             return file;
         }
+
+
     }
+
 
     public String getIpAddress() {
         String ip = "";
