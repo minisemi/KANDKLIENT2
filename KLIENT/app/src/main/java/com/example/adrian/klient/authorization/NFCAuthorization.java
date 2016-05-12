@@ -7,6 +7,8 @@ import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,14 +28,33 @@ public class NFCAuthorization extends AppCompatActivity {
     protected boolean authenticated;
     public static final String PREFS = "USER_INFO";
     SharedPreferences preferences;
+    NFCAuthorization context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.content_nfcauthorization);
         textViewInfo = (TextView) findViewById(R.id.info);
-        nfcAdapter = NfcAdapter.getDefaultAdapter(this);
-        pendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
+        Button login = (Button)findViewById(R.id.login);
+        context = this;
+        login.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //authenticationCode = getTagID(intent);
+                String authenticationCode = "549fc0bf";
+                getIDList(authenticationCode.hashCode());
+                Intent passwordIntent = new Intent(context, PasswordActivity.class);
+                preferences = getSharedPreferences(PREFS,MODE_PRIVATE);
+                SharedPreferences.Editor editor = preferences.edit();
+
+                editor.putInt("NFC_ID", authenticationCode.hashCode());
+                editor.apply();
+                startActivity(passwordIntent);
+
+            }
+        });
+        //nfcAdapter = NfcAdapter.getDefaultAdapter(this);
+        //pendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
     }
 
     @Override
@@ -77,7 +98,7 @@ public class NFCAuthorization extends AppCompatActivity {
         return authenticationCode.hashCode();
     }
 
-    @Override
+   /* @Override
     protected void onResume() {
         super.onResume();
         nfcAdapter.enableForegroundDispatch(this, pendingIntent, null, null);
@@ -90,7 +111,7 @@ public class NFCAuthorization extends AppCompatActivity {
         if (nfcAdapter != null) {
             nfcAdapter.disableForegroundDispatch(this);
         }
-    }
+    }*/
 
     public void getIDList(int authCode) {
         //TODO: Get the list from the database via the server.

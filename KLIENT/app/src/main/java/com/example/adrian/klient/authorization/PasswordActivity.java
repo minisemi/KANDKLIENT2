@@ -30,6 +30,7 @@ public class PasswordActivity extends AppCompatActivity {
         setContentView(R.layout.activity_password);
 
         final EditText passwordView = (EditText) findViewById(R.id.passwordInput);
+        passwordView.setText("test");
         Button enterButton = (Button) findViewById(R.id.enterButton);
 
         enterButton.setOnClickListener(new View.OnClickListener() {

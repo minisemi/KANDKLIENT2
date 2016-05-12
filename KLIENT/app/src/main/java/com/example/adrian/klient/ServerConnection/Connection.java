@@ -26,6 +26,7 @@ public class Connection implements Runnable {
     private String message;
     private boolean active;
     private Handler handler;
+    int SERVERPORT = 9010;
 
     public Connection(Request request, Context context, Handler handler) {
         this.context = context;
@@ -39,12 +40,18 @@ public class Connection implements Runnable {
         active = false;
     }
 
+    public Connection(Request request, Context context, int port) {
+        this.context = context;
+        message = request.message;
+        active = false;
+        SERVERPORT = port;
+    }
+
     @Override
     public void run() {
 
         String SERVERADRESS = "2016-4.itkand.ida.liu.se";
         String SERVERADRESS_BACKUP = "2016-3.itkand.ida.liu.se";
-        int SERVERPORT = 9001;
         int SERVERPORT_BACKUP = 9001;
         BufferedReader in = null;
         PrintWriter out = null;
@@ -55,19 +62,20 @@ public class Connection implements Runnable {
         Socket s = null;
         try {
             // Connect to primary server
-            s = new Client(context).getConnection(SERVERADRESS, SERVERPORT);
+            //s = new Client(context).getConnection(SERVERADRESS, SERVERPORT);
+            s = new Socket(SERVERADRESS, SERVERPORT);
         } catch (IOException e) {
             // Print error and try connect to backup server
             System.err.println("Cannot establish connection to " +
                     SERVERADRESS + ":" + SERVERPORT);
             System.err.println("Trying to connect to backup server on " + SERVERADRESS_BACKUP +
                     ":" + SERVERPORT_BACKUP);
-            try {
+            /*try {
                 s = new Client(context).getConnection(SERVERADRESS_BACKUP, SERVERPORT_BACKUP);
             } catch (IOException e1) {
 
                 System.err.println("Cannot establish connection to any server :(");
-            }
+            }*/
         }
 
         try {

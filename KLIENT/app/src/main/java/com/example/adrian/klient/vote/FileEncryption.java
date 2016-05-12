@@ -97,9 +97,9 @@ public class FileEncryption {
         // read AES key
         pkCipher.init(Cipher.DECRYPT_MODE, pk);
         aesKey = new byte[AES_Key_Size/8];
-        Log.d(TAG, "Encrypted AES key");
-        String encryptedText = fileUtils.readFileToString(in);
-        Log.d(TAG, encryptedText);
+       // Log.d(TAG, "Encrypted AES key");
+       // String encryptedText = fileUtils.readFileToString(in);
+      //  Log.d(TAG, encryptedText);
         CipherInputStream is = new CipherInputStream(new FileInputStream(in), pkCipher);
         is.read(aesKey);
         aeskeySpec = new SecretKeySpec(aesKey, "AES");

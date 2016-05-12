@@ -19,5 +19,6 @@
     <string name="title_activity_contact_list">ContactList</string>
     <string name="title_activity_contact">Contact List</string>
     <string name="title_activity_file_transfer">fileTransfer</string>
+    <string name="title_activity_asd">asd</string>
 
 </resources>

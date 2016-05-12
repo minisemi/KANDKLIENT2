@@ -85,6 +85,10 @@ public class Request {
         request.addProperty("activity", "vote");
         request.addProperty("action", "vote");
         request.addProperty("sessionid", id);
+        request.addProperty("encrypted", args[1]);
+        request.addProperty("starttime", args[2]);
+        request.addProperty("limit", args[3]);
+        request.addProperty("count", args[4]);
         data.addProperty("message", args[0]);
         dataArray.add(data);
         request.add("data", dataArray);
@@ -97,7 +101,9 @@ public class Request {
         request.addProperty("activity", "receive");
         request.addProperty("action", "receive");
         request.addProperty("sessionid", id);
-        request.addProperty("data","");
+        data.addProperty("IP", "ServerIP");
+        dataArray.add(data);
+        request.add("data", dataArray);
         message = request.toString();
         return this;
 

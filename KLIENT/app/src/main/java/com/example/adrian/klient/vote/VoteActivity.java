@@ -12,6 +12,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 
 import com.example.adrian.klient.R;
 import com.example.adrian.klient.internetcontrol.InternetController;
@@ -36,7 +37,7 @@ public class VoteActivity extends AppCompatActivity {
         public InternetController internetController = new InternetController(this);
 
     public String addressReceiver = "345.2534.64.65";
-    FileEncryption encryption;
+    //FileEncryption encryption;
     FileEncryption decryptionMix;
     FileEncryption decryptionReceiver;
     File in1;
@@ -53,8 +54,13 @@ public class VoteActivity extends AppCompatActivity {
     File rsaPrivateKeyMix;
     File encryptedAesKeyMix;
     File rsaPrivateKeyReceiver;
-    FileUtils fileUtils;
-    VoteAsyncTask voteAsyncTask;
+    //FileUtils fileUtils;
+    VoteAsyncTask voteAsyncTask2;
+    int limit = 1;
+    EditText voteLimit;
+    encryptThread eT;
+    FileUtils fileUtils1;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,8 +71,9 @@ public class VoteActivity extends AppCompatActivity {
 
         try {
 
-            InputStream inputStream = this.getAssets().open("In1.txt");
-            in1 = stream2file(inputStream, "In1",".txt");
+            // ALLA FILER SKRIVS I UTF-8. SERVERN LÄSER IN I ANSI, DÄRFÖR DET BLIR STRUL.
+            InputStream inputStream = this.getAssets().open("TEST.txt");
+            in1 = stream2file(inputStream, "TEST", ".txt");
             inputStream = this.getAssets().open("In2.txt");
             in2 = stream2file(inputStream, "In2", ".txt");
             inputStream = this.getAssets().open("encrypted1.txt");
@@ -76,46 +83,83 @@ public class VoteActivity extends AppCompatActivity {
             inputStream = this.getAssets().open("encrypted1_1.txt");
             encrypted1_1 = stream2file(inputStream, "encrypted1_1", ".txt");
             inputStream = this.getAssets().open("encrypted2_1.txt");
-            encrypted2_1 = stream2file(inputStream, "encrypted2_1",".txt");
+            encrypted2_1 = stream2file(inputStream, "encrypted2_1", ".txt");
             inputStream = this.getAssets().open("decrypted1.txt");
-            decrypted1 = stream2file(inputStream, "decrypted1",".txt");
+            decrypted1 = stream2file(inputStream, "decrypted1", ".txt");
             inputStream = this.getAssets().open("decrypted1_1.txt");
-            decrypted1_1 = stream2file(inputStream, "decrypted1_1",".txt");
+            decrypted1_1 = stream2file(inputStream, "decrypted1_1", ".txt");
             inputStream = this.getAssets().open("publicReceiver.der");
-            rsaPublicKeyReceiver = stream2file(inputStream, "publicReceiver",".der");
+            rsaPublicKeyReceiver = stream2file(inputStream, "publicReceiver", ".der");
             inputStream = this.getAssets().open("encryptedAesKeyReceiver.txt");
-            encryptedAesKeyReceiver = stream2file(inputStream, "encryptedAesKeyReceiver",".txt");
+            encryptedAesKeyReceiver = stream2file(inputStream, "encryptedAesKeyReceiver", ".txt");
             inputStream = this.getAssets().open("encryptedAesKeyMix.txt");
-            encryptedAesKeyMix = stream2file(inputStream, "encryptedAesKeyMix",".txt");
+            encryptedAesKeyMix = stream2file(inputStream, "encryptedAesKeyMix", ".txt");
             inputStream = this.getAssets().open("privateSender.der");
-            rsaPrivateKeyMix = stream2file(inputStream, "privateSender",".der");
+            rsaPrivateKeyMix = stream2file(inputStream, "privateSender", ".der");
             inputStream = this.getAssets().open("publicSender.der");
-            rsaPublicKeyMix = stream2file(inputStream, "publicSender",".der");
+            rsaPublicKeyMix = stream2file(inputStream, "publicSender", ".der");
             inputStream = this.getAssets().open("privateReceiver.der");
-            rsaPrivateKeyReceiver = stream2file(inputStream, "privateReceiver",".der");
+            rsaPrivateKeyReceiver = stream2file(inputStream, "privateReceiver", ".der");
             inputStream.close();
 
 
-            fileUtils = new FileUtils();
+            /*fileUtils = new FileUtils();
             decryptionMix = new FileEncryption();
             decryptionReceiver = new FileEncryption();
             encryption = new FileEncryption();
             encryption.makeKey();
         } catch (GeneralSecurityException e){
             e.printStackTrace();
-        }
+        }*/
 
-        catch (IOException i){
+        }catch (IOException i){
             i.printStackTrace();
         }
+
+        voteLimit = (EditText) findViewById(R.id.votelimit);
+        voteLimit.setText("1");
 
         Button vote1 = (Button) findViewById(R.id.voteButton1);
         vote1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (internetController.InternetAvailable()) {
-                    voteAsyncTask = new VoteAsyncTask(context, encryptMix(encrypted1, encrypted1_1, encryptClient(in1, encrypted1)));
-                    voteAsyncTask.execute();
+                    limit = Integer.parseInt(voteLimit.getText().toString());
+                    for (int i = 1; i <= limit; i++) {
+                        long time = System.currentTimeMillis();
+                        String startTime = Long.toString(time);
+
+                        /*
+                        voteAsyncTask = new VoteAsyncTask(context, encryptMix(encrypted1, encrypted1_1, encryptClient(in1, encrypted1)), "true", startTime, Integer.toString(limit));
+                            voteAsyncTask.execute();
+                        encryptMix(encrypted1, encrypted1_1, encryptClient(in1, encrypted1));
+                        decryptMix(encrypted1_1, decrypted1_1);
+                        decryptReceiver(decrypted1_1, decrypted1);*/
+                        eT = new encryptThread(startTime, i);
+                        eT.start();
+                    }
+
+
+                    /*try {
+                        //encryption.makeKey();
+                       // encryption.saveKey(encryptedAesKeyReceiver, rsaPublicKeyReceiver);
+
+                        String encryptedAesKey = fileUtils.readFileToString(encryptedAesKeyReceiver);
+                        String IN1 = fileUtils.readFileToString(in1);
+                        encryption.encrypt(in1, encrypted1);
+                        Log.d("RECEIVEASYNCTASK: ","DECRYPTED AESKEY: "+encryptedAesKey);
+                        encryption.loadKey(encryptedAesKeyReceiver, rsaPrivateKeyReceiver);
+                        String encryptedText = fileUtils.readFileToString(encrypted1);
+                        Log.d("RECEIVEASYNCTASK: ","ENCRYPTED TEXT: "+encryptedText);
+                        encryption.decrypt(encrypted1, decrypted1);
+                        String decryptedText = fileUtils.readFileToString(decrypted1);
+                        Log.d("RECEIVEASYNCTASK: ","DECRYPTED TEXT: "+decryptedText);
+                    } catch (GeneralSecurityException g){
+                        g.printStackTrace();
+                    } catch (IOException i){
+                        i.printStackTrace();
+                    }*/
+
                     //String string = encryptMix(encrypted1, encrypted1_1, encryptClient(in1, encrypted1));
                     //JsonObject j = encryptClient(in1, encrypted1);
 
@@ -133,30 +177,87 @@ public class VoteActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (internetController.InternetAvailable()) {
+                    limit = Integer.parseInt(voteLimit.getText().toString());
+                    for (int i = 1; i <= limit; i++){
+                        long time = System.currentTimeMillis();
+                        String startTime = Long.toString(time);
+                        try {
+                            String vote = fileUtils1.readFileToString(in1);
+                        voteAsyncTask2 = new VoteAsyncTask(context, vote, "false", startTime, Integer.toString(limit), Integer.toString(i));
+                        voteAsyncTask2.execute();
+                        }catch (IOException j){
+                            j.printStackTrace();
+                        }
+                    }
 
+                    //SKICKA OKRYPTERAT HÄR FÖR ATT JÄMFÖRA
                     //encrypt(in2, encrypted2);
                     //decryptMix (encrypted1_1, decrypted1_1);
                     //decryptReceiver (decrypted1_1, decrypted1);
                     //decryptReceiver(encrypted1, decrypted1);
-                    voteAsyncTask = new VoteAsyncTask(context, encryptMix(encrypted2, encrypted2_1, encryptClient(in2, encrypted2)));
-                    voteAsyncTask.execute();
-                    Snackbar.make(v, "Update successful!", Snackbar.LENGTH_LONG)
+                    //voteAsyncTask = new VoteAsyncTask(context, encryptMix(encrypted2, encrypted2_1, encryptClient(in2, encrypted2)));
+                   // voteAsyncTask.execute();
+                    Snackbar.make(v, "Voting successful!", Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
                 } else {
-                    Snackbar.make(v, "No connection available. Update not successful!", Snackbar.LENGTH_LONG)
+                    Snackbar.make(v, "No connection available. Voting not successful!", Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
                 }
             }
         });
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+    }
+
+    public class encryptThread extends Thread {
+        String encryptedText;
+        FileEncryption encryption;
+        FileUtils fileUtils;
+        Boolean done = false;
+        String startTime;
+        String count;
+
+        public encryptThread (String startTime, int i){
+            this.startTime = startTime;
+            this.count = Integer.toString(i);
+
+        }
+
+        @Override
+        public void run() {
+            super.run();
+
+            try {
+                encryption = new FileEncryption();
+                fileUtils = new FileUtils();
+                encryption.makeKey();
+                encryption.saveKey(encryptedAesKeyReceiver, rsaPublicKeyReceiver);
+                encryption.encrypt(in1, encrypted1);
+                encryption.saveKey(encryptedAesKeyMix, rsaPublicKeyMix);
+                encryption.encrypt(encrypted1, encrypted1_1);
+                Log.d("THREAD: ", "DONE");
+                encryptedText = fileUtils.readFileToString(encrypted1_1);
+                //done = true;
+
+                VoteAsyncTask voteAsyncTask = new VoteAsyncTask(context, encryptedText, "true", startTime, Integer.toString(limit), count);
+                voteAsyncTask.execute();
+               /* encryption.loadKey(encryptedAesKeyMix, rsaPrivateKeyMix);
+                encryption.decrypt(encrypted1_1, decrypted1_1);
+                encryption.loadKey(encryptedAesKeyReceiver, rsaPrivateKeyReceiver);
+                encryption.decrypt(decrypted1_1, decrypted1);
+                String l = fileUtils.readFileToString(decrypted1);
+                Log.d("DECrypted TeXT", l);*/
+            } catch (GeneralSecurityException g){
+                g.printStackTrace();
+            } catch (IOException k){
+                k.printStackTrace();
             }
-        });
+        }
+
+
+
+        public String getEncryptedText () {return encryptedText;}
+
+        public Boolean getDone () {return done;}
     }
 
     public File stream2file (InputStream in, String prefix, String suffix) throws IOException {
@@ -170,18 +271,19 @@ public class VoteActivity extends AppCompatActivity {
         return file;
     }
 
-    public String encrypt (File in, File out, File rsaPublicKey, File encryptedAesKey) {
+   /* public String encrypt (File in, File out, File rsaPublicKey, File encryptedAesKey) {
         try {
-            Log.d(TAG, "File text");
-            String encryptedText1 = fileUtils.readFileToString(in);
-            Log.d(TAG, encryptedText1);
+       //     Log.d(TAG, "File text");
+           // String encryptedText1 = fileUtils.readFileToString(in);
+            //Log.d(TAG, encryptedText1);
 
             encryption.saveKey(encryptedAesKey, rsaPublicKey);
+          //  String aeskey = fileUtils.readFileToString(encryptedAesKey);
             encryption.encrypt(in, out);
-            Log.d(TAG, "Encrypted file text");
+          //  Log.d(TAG, "Encrypted file text");
 
             String encryptedText = fileUtils.readFileToString(out);
-                Log.d(TAG, encryptedText);
+       //         Log.d(TAG, encryptedText);
             //BufferedReader brM1 = new BufferedReader(new InputStreamReader(new FileInputStream(out)));
 
 
@@ -196,14 +298,14 @@ public class VoteActivity extends AppCompatActivity {
 
     public void decryptMix (File in, File out){
         try {
-            Log.d(TAG, "Encrypted text at Mix");
-            String encryptedText1 = fileUtils.readFileToString(in);;
-            Log.d(TAG, encryptedText1);
+           // Log.d(TAG, "Encrypted text at Mix");
+          //  String encryptedText1 = fileUtils.readFileToString(in);;
+          //  Log.d(TAG, encryptedText1);
             decryptionMix.loadKey(encryptedAesKeyMix, rsaPrivateKeyMix);
             decryptionMix.decrypt(in, out);
-            Log.d(TAG, "Decrypted text at Mix");
-            String encryptedText = fileUtils.readFileToString(out);;
-            Log.d(TAG, encryptedText);
+            //Log.d(TAG, "Decrypted text at Mix");
+           // String encryptedText = fileUtils.readFileToString(out);;
+            //Log.d(TAG, encryptedText);
         } catch (IOException i){
             i.printStackTrace();
         } catch (GeneralSecurityException e){
@@ -213,20 +315,20 @@ public class VoteActivity extends AppCompatActivity {
 
     public void decryptReceiver (File in, File out){
         try {
-            String encryptedText1 = fileUtils.readFileToString(in).replace("RANDOM_SALT","");
+            //String encryptedText1 = fileUtils.readFileToString(in).replace("RANDOM_SALT","");
             //JsonParser parser = new JsonParser();
             //JsonObject jo = (JsonObject)parser.parse(encryptedText1);
-            String [] parts = encryptedText1.split("\"?,?\"[a-z]*\":\"");
+            //String [] parts = encryptedText1.split("\"?,?\"[a-z]*\":\"");
             //String encryptedMessage = jo.get("message").getAsString().toLowerCase();
-            String encryptedMessage = parts[2];
-            String [] encryptedKeyParts = parts [3].split("\"}");
+          //  String encryptedMessage = parts[2];
+//            String [] encryptedKeyParts = parts [3].split("\"}");
             //String encryptedKey = jo.get("aeskey").getAsString().toLowerCase();
-            String encryptedKey = parts[3].replace("\"}", "");
-            BufferedWriter writer = new BufferedWriter(new FileWriter(encryptedAesKeyReceiver, false /*append*/));
+          //  String encryptedKey = parts[3].replace("\"}", "");
+            BufferedWriter writer = new BufferedWriter(new FileWriter(encryptedAesKeyReceiver, false ));
             writer.write(encryptedKey);
             writer.close();
             decryptionReceiver.loadKey(encryptedAesKeyReceiver, rsaPrivateKeyReceiver);
-            writer = new BufferedWriter(new FileWriter(in, false /*append*/));
+            writer = new BufferedWriter(new FileWriter(in, false ));
             writer.write(encryptedMessage);
             writer.close();
             decryptionReceiver.decrypt(in, out);
@@ -257,20 +359,20 @@ public class VoteActivity extends AppCompatActivity {
         try{
 
         String encryptedClientText = "RANDOM_SALT" + jsonString;
-        BufferedWriter writer = new BufferedWriter(new FileWriter(in, false /*append*/));
+        BufferedWriter writer = new BufferedWriter(new FileWriter(in, false ));
             writer.write(encryptedClientText);
             writer.close();
 
             String encryptedText = encrypt(in, out, rsaPublicKeyMix, encryptedAesKeyMix);
             String encryptedAesKey = encryption.getEncryptedAesKey(encryptedAesKeyMix);
             //String jsonStringMix = "{\"activity\":\"vote\",\"message\":\""+encryptedText+"\",\"aeskey\":\""+encryptedAesKey+"\"}";
-            Log.d(TAG, "jsonStringMix");
-            Log.d(TAG, jsonString);
+           // Log.d(TAG, "jsonStringMix");
+           // Log.d(TAG, jsonString);
             JsonObject paramsMix = new JsonObject();
             paramsMix.addProperty("activity", "vote");
             paramsMix.addProperty("message", encryptedText);
-            Log.d(TAG, "Encrypted AES key Mix");
-            Log.d(TAG, encryptedAesKey);
+         //   Log.d(TAG, "Encrypted AES key Mix");
+         //   Log.d(TAG, encryptedAesKey);
             paramsMix.addProperty("aeskey", encryptedAesKey);
             return paramsMix.toString();
 
@@ -279,6 +381,6 @@ public class VoteActivity extends AppCompatActivity {
         }
         return "";
 
-    }
+    }*/
 
 }
