@@ -61,11 +61,13 @@ public class Server {
     JsonObject receivedObject;
     BufferedReader in;
     int count1 = 0, count2 = 0;
+    int count11=0, count22 =0;
 
 
     String receivedVote;
     Long timeElapsed1, timeElapsed2;
     String startTime1="0", startTime2="0";
+    int newLimit2=0, newLimit1=0;
 
 
 
@@ -183,24 +185,28 @@ public class Server {
                     //String decryptedText = fileUtils.readFileToString(decrypted1);
                     //Log.d("RECEIVEASYNCTASK: ","DECRYPTED TEXT: "+decryptedText);
                      count1++;
+                    count11++;
 
                     limit1 = Integer.parseInt(receivedObject.get("limit").getAsString().toLowerCase());
-                    votes1 = Integer.toString(count1);
+
+                    votes1 = Integer.toString(count11);
                     if (order1 == 1){
                         startTime1 = receivedObject.get("starttime").getAsString().toLowerCase();
                     }
 
                     if (count1 == limit1) {
-                        timeElapsed1 = System.currentTimeMillis() - 1430 - Long.parseLong(startTime1);
+                        timeElapsed1 = System.currentTimeMillis() -600 - Long.parseLong(startTime1);
                     }
 
                     activity.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
                             activity.votes1.setText(votes1);
+
                             if (count1 == limit1){
                                 String elapsed1 = Long.toString(timeElapsed1);
                                 message += count1 + " encrypted votes took: " + elapsed1 + " milliseconds" + "\n";
+
                                 count1 = 0;
                                 activity.msg.setText(message);
 
@@ -218,19 +224,23 @@ public class Server {
 
                 order2 = Integer.parseInt(receivedObject.get("count").getAsString().toLowerCase());
                 count2++;
+                count22++;
                 limit2 = Integer.parseInt(receivedObject.get("limit").getAsString().toLowerCase());
-                votes2 = Integer.toString(count2);
+                String k = receivedObject.get("message").getAsString().toLowerCase();
+
+                votes2 = Integer.toString(count22);
                 if (order2 == 1) {
                     startTime2 = receivedObject.get("starttime").getAsString().toLowerCase();
                 }
 
                 if (count2 == limit2) {
-                    timeElapsed2 = System.currentTimeMillis() - 1430 - Long.parseLong(startTime2);
+                    timeElapsed2 = System.currentTimeMillis() -600 - Long.parseLong(startTime2);
                 }
 
                 activity.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+
                         activity.votes2.setText(votes2);
 
                         if (count2 == limit2) {

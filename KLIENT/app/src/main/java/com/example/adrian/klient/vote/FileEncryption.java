@@ -124,6 +124,7 @@ public class FileEncryption {
         byte[] encodedKey = new byte[(int)publicKeyFile.length()];
         new FileInputStream(publicKeyFile).read(encodedKey);
 
+
         // create public key
         X509EncodedKeySpec publicKeySpec = new X509EncodedKeySpec(encodedKey);
         KeyFactory kf = KeyFactory.getInstance("RSA");

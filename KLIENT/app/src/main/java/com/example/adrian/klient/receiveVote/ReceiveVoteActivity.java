@@ -82,7 +82,6 @@ public class ReceiveVoteActivity extends AppCompatActivity {
         setContentView(R.layout.activity_receive_vote);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        final Button updateIP = (Button) findViewById(R.id.button);
         final Button server1     = (Button) findViewById(R.id.server);
         infoip = (TextView) findViewById(R.id.infoip);
         msg = (TextView) findViewById(R.id.msg);
@@ -95,25 +94,11 @@ public class ReceiveVoteActivity extends AppCompatActivity {
         votes1.setText("0");
         votes2.setText("0");
 
-
-        updateIP.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //updateIPAsync = new ReceiveAsyncTask(receiveVoteActivity, "update");
-                //updateIPAsync.execute();
-                Long h = System.currentTimeMillis();
-                String k = Long.toString(h);
-                msg.setText(k);
-
-
-            }
-        });
-
         server1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
         server = new Server(receiveVoteActivity);
-        infoip.setText(server.getIpAddress() + ":" + server.getPort());
+        infoip.setText("Listening on: IP: 130.236.224.133 - Port: 8080");
                // clientServer = new ReceiveAsyncTask(receiveVoteActivity, "receive");
                // clientServer.execute();
 

@@ -13,6 +13,24 @@
     tools:context="com.example.adrian.klient.vote.VoteActivity"
     tools:showIn="@layout/activity_vote">
 
+    <TextView
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="Number of votes to send:"
+        android:textAlignment="center"/>
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:id="@+id/votelimit"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="Press a button to vote:"/>
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -24,28 +42,17 @@
         android:layout_width="170dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:text="Vote1"/>
+        android:text="Encrypted"/>
 
     <Button
         android:id="@+id/voteButton2"
         android:layout_width="170dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:text="Vote2"/>
+        android:text="Non-encrypted"/>
     </LinearLayout>
 
-        <TextView
-            android:layout_width="200dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:text="Number of votes to send:"
-            android:textAlignment="center"/>
 
-        <EditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:id="@+id/votelimit"/>
 
 
 

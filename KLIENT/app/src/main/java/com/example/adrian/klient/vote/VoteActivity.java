@@ -145,7 +145,7 @@ public class VoteActivity extends AppCompatActivity {
                             encryption.saveKey(encryptedAesKeyMix, rsaPublicKeyMix);
                             encryption.encrypt(encrypted1, encrypted1_1);
                             String encrypted = fileUtils.readFileToString(encrypted1_1);
-                        voteAsyncTask = new VoteAsyncTask(context, encrypted, "true", startTime, Integer.toString(limit), Integer.toString(i));
+                        voteAsyncTask = new VoteAsyncTask(context, "h", "true", startTime, Integer.toString(limit), Integer.toString(i));
                             voteAsyncTask.execute();
                         }catch (GeneralSecurityException k){
                             k.printStackTrace();
@@ -201,9 +201,13 @@ public class VoteActivity extends AppCompatActivity {
                     for (int i = 1; i <= limit; i++){
                         long time = System.currentTimeMillis();
                         String startTime = Long.toString(time);
-
-                        voteAsyncTask2 = new VoteAsyncTask(context, "Alexander rostar pa 2", "false", startTime, Integer.toString(limit), Integer.toString(i));
+                        try {
+                            String k = fileUtils.readFileToString(in1);
+                        voteAsyncTask2 = new VoteAsyncTask(context, k, "false", startTime, Integer.toString(limit), Integer.toString(i));
                         voteAsyncTask2.execute();
+                        } catch (IOException j){
+                            j.printStackTrace();
+                        }
                     }
 
                     //SKICKA OKRYPTERAT HÄR FÖR ATT JÄMFÖRA
