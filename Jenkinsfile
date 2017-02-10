@@ -1,10 +1,10 @@
-//script /usr/bin/make
+script C:\Program Files (x86)\GnuWin32\bin\make.exe
 import jenkins.model.Jenkins
 
 node{
 stage('Build') { // <2>
         echo 'Hello'
-        bat 'C:/Program Files (x86)/GnuWin32/bin/make.exe' // <3>
+        bat 'make' // <3>
         archiveArtifacts artifacts: '**/target/*.jar', fingerprint: true
     }
 
