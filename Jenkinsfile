@@ -1,4 +1,4 @@
-script C:\Program Files (x86)\GnuWin32\bin\
+//script C:\Program Files (x86)\GnuWin32\bin\
 import jenkins.model.Jenkins
 
 node{
