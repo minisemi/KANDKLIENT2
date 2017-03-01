@@ -1,4 +1,4 @@
-//script C:\Program Files (x86)\GnuWin32\bin\make.exe
+script C:\Program Files (x86)\GnuWin32\bin\make.exe
 import jenkins.model.Jenkins
 
 node{
