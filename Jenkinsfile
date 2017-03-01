@@ -6,7 +6,7 @@ stage('Build') { // <2>
         echo 'Hello'
         //bat 'make'
         sh "C:/Program Files (x86)/GnuWin32/bin/make.exe"  // <3>
-        println "Donw with make"
+        echo 'Done with make'
         archiveArtifacts artifacts: '**/target/*.jar', fingerprint: true
     }
 
