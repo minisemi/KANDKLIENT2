@@ -5,7 +5,8 @@ node{
 stage('Build') { // <2>
         echo 'Hello'
         //bat 'make'
-        sh "C:/Program Files (x86)/GnuWin32/bin/make.exe" ,  returnStdout: true // <3>
+        sh "C:/Program Files (x86)/GnuWin32/bin/make.exe"  // <3>
+        println "Donw with make"
         archiveArtifacts artifacts: '**/target/*.jar', fingerprint: true
     }
 
