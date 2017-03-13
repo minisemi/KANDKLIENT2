@@ -4,7 +4,7 @@
 node{
 stage('Build') { // <2>
         echo 'Hello'
-        docker version
+        sh 'docker version'
         //bat 'make'
         //sh "C:/Program Files (x86)/GnuWin32/bin/make.exe"  // <3>
         //echo 'Done with make'
