@@ -1,12 +1,8 @@
 <html>
 <head>
-<title>Bachelors project</title>
+<h1>Bachelors project</h1>
 </head>
 <body>
-
-<h>Created this app as a part of my bachelors project (kandidatarbete). The app is unfortunately really server-dependant and since the
-server and database was shut down by my university after the project was completed, we no longer have access to it. Hence the majority
-of the functions no longer work. The server code is maintained in another repository.</h>
 
 <p>The app is meant to function as a help tool for firemen in the field. A user first logs in with a valid NFC-card, but for demonstration
 purposes I also implemented an invisible button in the middle of the screen on the enlarged icon-image which doesn't require a valid NFC-card.
